@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4472C4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>💰 Tracker Spese</title>
+    <link rel="manifest" href="manifest.json">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #4472C4;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .settings-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .form {
+            padding: 30px 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4472C4;
+            box-shadow: 0 0 0 3px rgba(68, 114, 196, 0.1);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            margin-top: 10px;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #4472C4;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .info-box strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #4472C4;
+        }
+        
+        .help-link {
+            color: #4472C4;
+            text-decoration: none;
+            font-size: 13px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .config-status {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SCHERMATA CONFIGURAZIONE -->
+        <div id="setupScreen" class="screen">
+            <div class="header">
+                <h1>⚙️ Configurazione</h1>
+                <p>Setup iniziale dell'app</p>
+            </div>
+            
+            <div class="form">
+                <div class="info-box">
+                    <strong>📋 Cosa ti serve:</strong>
+                    1. Token API Baserow<br>
+                    2. ID della tua tabella<br>
+                    <a href="#" class="help-link" onclick="showHelp(); return false;">❓ Come trovare questi dati?</a>
+                </div>
+                
+                <form id="setupForm">
+                    <div class="form-group">
+                        <label for="apiToken">🔑 Token API Baserow</label>
+                        <input type="text" id="apiToken" placeholder="es. stTV1GmX4w3mkmF1PQPKh9gfMYv24IRs" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tableId">🗂️ Table ID</label>
+                        <input type="text" id="tableId" placeholder="es. 831459" required>
+                    </div>
+                    
+                    <button type="button" class="btn" onclick="testConnection()">
+                        🔍 Testa Connessione
+                    </button>
+                    
+                    <button type="submit" class="btn" style="margin-top: 10px;">
+                        💾 Salva Configurazione
+                    </button>
+                    
+                    <div id="setupMessage" class="message"></div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- SCHERMATA HELP -->
+        <div id="helpScreen" class="screen">
+            <div class="header">
+                <h1>❓ Guida</h1>
+                <p>Come trovare Token e Table ID</p>
+            </div>
+            
+            <div class="form">
+                <div class="info-box">
+                    <strong>🔑 Token API:</strong>
+                    1. Vai su baserow.io e fai login<br>
+                    2. Click sull'icona profilo in alto a destra<br>
+                    3. Seleziona "Settings" → "API tokens"<br>
+                    4. Crea un nuovo token o copia quello esistente
+                </div>
+                
+                <div class="info-box">
+                    <strong>🗂️ Table ID:</strong>
+                    1. Apri la tua tabella in Baserow<br>
+                    2. Guarda l'URL del browser<br>
+                    3. Sarà tipo: baserow.io/database/XXXXX/table/<strong>831459</strong><br>
+                    4. Copia il numero finale (Table ID)
+                </div>
+                
+                <button class="btn" onclick="showSetup()">
+                    ⬅️ Torna alla Configurazione
+                </button>
+            </div>
+        </div>
+        
+        <!-- SCHERMATA PRINCIPALE -->
+        <div id="mainScreen" class="screen">
+            <div class="header">
+                <h1>💰 Tracker Spese</h1>
+                <p>Aggiungi le tue spese velocemente</p>
+                <button class="settings-btn" onclick="showSetup()">⚙️</button>
+            </div>
+            
+            <div class="form">
+                <div class="config-status" id="configStatus" style="display: none;"></div>
+                
+                <form id="spesaForm">
+                    <div class="form-group">
+                        <label for="data">📅 Data</label>
+                        <input type="date" id="data" name="data" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="descrizione">📝 Descrizione</label>
+                        <input type="text" id="descrizione" name="descrizione" placeholder="es. Pane, Caffè..." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="importo">💶 Importo (€)</label>
+                        <input type="number" id="importo" name="importo" step="0.01" placeholder="es. 1.50" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="categoria">🏷️ Categoria</label>
+                        <select id="categoria" name="categoria" required>
+                            <option value="">Seleziona...</option>
+                            <option value="Alimentari">🍞 Alimentari</option>
+                            <option value="Ristorazione">🍕 Ristorazione</option>
+                            <option value="Bar/Caffè">☕ Bar/Caffè</option>
+                            <option value="Trasporti">🚗 Trasporti</option>
+                            <option value="Casa/Utenze">🏠 Casa/Utenze</option>
+                            <option value="Abbigliamento">👕 Abbigliamento</option>
+                            <option value="Intrattenimento">🎮 Intrattenimento</option>
+                            <option value="Salute">💊 Salute</option>
+                            <option value="Altro">🔧 Altro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="metodo">💳 Metodo Pagamento</label>
+                        <select id="metodo" name="metodo" required>
+                            <option value="">Seleziona...</option>
+                            <option value="Contanti">💵 Contanti</option>
+                            <option value="Carta">💳 Carta</option>
+                            <option value="Bancomat">🏧 Bancomat</option>
+                            <option value="PayPal/Digitale">📱 PayPal/Digitale</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="necessita">⚡ Necessità</label>
+                        <select id="necessita" name="necessita" required>
+                            <option value="">Seleziona...</option>
+                            <option value="Essenziale">✅ Essenziale</option>
+                            <option value="Utile">👍 Utile</option>
+                            <option value="Vizio">😋 Vizio</option>
+                            <option value="Spreco">❌ Spreco</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="note">📌 Note (opzionale)</label>
+                        <textarea id="note" name="note" rows="2" placeholder="Dettagli aggiuntivi..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="submitBtn">
+                        💾 Salva Spesa
+                    </button>
+                    
+                    <div id="message" class="message"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Stato dell'app
+        let config = {
+            token: null,
+            tableId: null,
+            fieldMapping: {}
+        };
+        
+        // Carica configurazione al caricamento
+        window.addEventListener('DOMContentLoaded', () => {
+            loadConfig();
+            document.getElementById('data').valueAsDate = new Date();
+        });
+        
+        // Carica configurazione da localStorage
+        function loadConfig() {
+            const saved = localStorage.getItem('trackerConfig');
+            if (saved) {
+                config = JSON.parse(saved);
+                showMain();
+                updateConfigStatus();
+            } else {
+                showSetup();
+            }
+        }
+        
+        // Salva configurazione
+        function saveConfig() {
+            localStorage.setItem('trackerConfig', JSON.stringify(config));
+        }
+        
+        // Test connessione
+        async function testConnection() {
+            const token = document.getElementById('apiToken').value.trim();
+            const tableId = document.getElementById('tableId').value.trim();
+            const messageDiv = document.getElementById('setupMessage');
+            
+            if (!token || !tableId) {
+                showMessage(messageDiv, 'error', '❌ Compila tutti i campi!');
+                return;
+            }
+            
+            messageDiv.className = 'message';
+            messageDiv.textContent = '🔄 Connessione in corso...';
+            messageDiv.style.display = 'block';
+            
+            try {
+                // Recupera i campi della tabella
+                const response = await fetch(
+                    `https://api.baserow.io/api/database/fields/table/${tableId}/`,
+                    {
+                        headers: {
+                            'Authorization': `Token ${token}`
+                        }
+                    }
+                );
+                
+                if (!response.ok) {
+                    throw new Error('Token o Table ID non validi');
+                }
+                
+                const fields = await response.json();
+                
+                // Mappa automaticamente i campi
+                const fieldMapping = {};
+                const requiredFields = ['Data', 'Descrizione', 'Importo', 'Categoria', 
+                                       'Metodo pagamento', 'Necessità', 'Note'];
+                
+                fields.forEach(field => {
+                    const name = field.name;
+                    requiredFields.forEach(req => {
+                        if (name.toLowerCase() === req.toLowerCase()) {
+                            fieldMapping[req] = `field_${field.id}`;
+                        }
+                    });
+                });
+                
+                // Verifica che tutti i campi siano stati trovati
+                const missingFields = requiredFields.filter(f => !fieldMapping[f]);
+                
+                if (missingFields.length > 0) {
+                    throw new Error(`Campi mancanti: ${missingFields.join(', ')}`);
+                }
+                
+                showMessage(messageDiv, 'success', 
+                    `✅ Connessione riuscita! Trovati ${fields.length} campi.`);
+                
+                // Abilita il pulsante salva
+                document.querySelector('#setupForm button[type="submit"]').disabled = false;
+                
+            } catch (error) {
+                showMessage(messageDiv, 'error', `❌ Errore: ${error.message}`);
+            }
+        }
+        
+        // Setup form submit
+        document.getElementById('setupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const token = document.getElementById('apiToken').value.trim();
+            const tableId = document.getElementById('tableId').value.trim();
+            const messageDiv = document.getElementById('setupMessage');
+            
+            messageDiv.className = 'message';
+            messageDiv.textContent = '🔄 Configurazione in corso...';
+            messageDiv.style.display = 'block';
+            
+            try {
+                // Recupera i campi
+                const response = await fetch(
+                    `https://api.baserow.io/api/database/fields/table/${tableId}/`,
+                    {
+                        headers: {
+                            'Authorization': `Token ${token}`
+                        }
+                    }
+                );
+                
+                if (!response.ok) {
+                    throw new Error('Token o Table ID non validi');
+                }
+                
+                const fields = await response.json();
+                
+                // Mappa i campi
+                const fieldMapping = {};
+                const requiredFields = ['Data', 'Descrizione', 'Importo', 'Categoria', 
+                                       'Metodo pagamento', 'Necessità', 'Note'];
+                
+                fields.forEach(field => {
+                    const name = field.name;
+                    requiredFields.forEach(req => {
+                        if (name.toLowerCase() === req.toLowerCase()) {
+                            fieldMapping[req] = `field_${field.id}`;
+                        }
+                    });
+                });
+                
+                // Salva configurazione
+                config.token = token;
+                config.tableId = tableId;
+                config.fieldMapping = fieldMapping;
+                saveConfig();
+                
+                showMessage(messageDiv, 'success', '✅ Configurazione salvata!');
+                
+                setTimeout(() => {
+                    showMain();
+                    updateConfigStatus();
+                }, 1500);
+                
+            } catch (error) {
+                showMessage(messageDiv, 'error', `❌ Errore: ${error.message}`);
+            }
+        });
+        
+        // Form spesa submit
+        document.getElementById('spesaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('message');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Invio in corso...';
+            
+            // Crea l'oggetto dati con i field ID corretti
+            const formData = {};
+            formData[config.fieldMapping['Data']] = document.getElementById('data').value;
+            formData[config.fieldMapping['Descrizione']] = document.getElementById('descrizione').value;
+            formData[config.fieldMapping['Importo']] = parseFloat(document.getElementById('importo').value);
+            formData[config.fieldMapping['Categoria']] = document.getElementById('categoria').value;
+            formData[config.fieldMapping['Metodo pagamento']] = document.getElementById('metodo').value;
+            formData[config.fieldMapping['Necessità']] = document.getElementById('necessita').value;
+            formData[config.fieldMapping['Note']] = document.getElementById('note').value;
+            
+            try {
+                const response = await fetch(
+                    `https://api.baserow.io/api/database/rows/table/${config.tableId}/`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Token ${config.token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    }
+                );
+                
+                if (!response.ok) {
+                    throw new Error('Errore durante il salvataggio');
+                }
+                
+                showMessage(messageDiv, 'success', '✅ Spesa salvata con successo!');
+                
+                // Reset form
+                document.getElementById('spesaForm').reset();
+                document.getElementById('data').valueAsDate = new Date();
+                
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                showMessage(messageDiv, 'error', `❌ Errore: ${error.message}`);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💾 Salva Spesa';
+            }
+        });
+        
+        // Utility functions
+        function showMessage(div, type, text) {
+            div.className = `message ${type}`;
+            div.textContent = text;
+            div.style.display = 'block';
+        }
+        
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+        
+        function showSetup() {
+            document.getElementById('apiToken').value = config.token || '';
+            document.getElementById('tableId').value = config.tableId || '';
+            showScreen('setupScreen');
+        }
+        
+        function showMain() {
+            showScreen('mainScreen');
+        }
+        
+        function showHelp() {
+            showScreen('helpScreen');
+        }
+        
+        function updateConfigStatus() {
+            const status = document.getElementById('configStatus');
+            if (config.token && config.tableId) {
+                status.textContent = `✅ Connesso a Baserow (Tabella ${config.tableId})`;
+                status.style.display = 'block';
+            }
+        }
+        
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>

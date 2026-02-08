@@ -1,0 +1,18 @@
+{
+  "name": "Tracker Spese",
+  "short_name": "Spese",
+  "description": "App per tracciare le tue spese quotidiane",
+  "start_url": "/tracker-spese-app.html",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#4472C4",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%234472C4' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white'>💰</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
