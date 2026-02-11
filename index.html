@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4472C4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tracker Spese">
+    <title>💰 Tracker Spese</title>
+    
+    <!-- Manifest inline -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlRyYWNrZXIgU3Blc2UiLAogICJzaG9ydF9uYW1lIjogIlNwZXNlIiwKICAiZGVzY3JpcHRpb24iOiAiQXBwIHBlciB0cmFjY2lhcmUgbGUgdHVlIHNwZXNlIHF1b3RpZGlhbmUiLAogICJzdGFydF91cmwiOiAiLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzY2N2VlYSIsCiAgInRoZW1lX2NvbG9yIjogIiM0NDcyQzQiLAogICJvcmllbnRhdGlvbiI6ICJwb3J0cmFpdCIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbCw8c3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgdmlld0JveD0nMCAwIDEwMCAxMDAnPjxyZWN0IGZpbGw9JyUyMzQ0NzJDNCcgd2lkdGg9JzEwMCcgaGVpZ2h0PScxMDAnIHJ4PScyMCcvPjx0ZXh0IHg9JzUwJyB5PSc3MCcgZm9udC1zaXplPSc2MCcgdGV4dC1hbmNob3I9J21pZGRsZScgZmlsbD0nd2hpdGUnPvCfkrA8L3RleHQ+PC9zdmc+IiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIiwKICAgICAgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIgogICAgfQogIF0KfQ==">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header {
+            background: #4472C4;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .settings-btn:active {
+            background: rgba(255,255,255,0.4);
+            transform: scale(0.95);
+        }
+        
+        .form {
+            padding: 30px 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4472C4;
+            box-shadow: 0 0 0 3px rgba(68, 114, 196, 0.1);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #4472C4;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .info-box strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #4472C4;
+        }
+        
+        .help-link {
+            color: #4472C4;
+            text-decoration: none;
+            font-size: 13px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .config-status {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .install-banner {
+            background: #4472C4;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .install-banner:active {
+            background: #3562a4;
+        }
+        
+        .install-banner.hidden {
+            display: none;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #4472C4;
+            border-radius: 10px;
+            padding: 30px 20px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .file-upload-area:hover {
+            background: #e9ecef;
+            border-color: #3562a4;
+        }
+        
+        .file-upload-area.dragover {
+            background: #e7f3ff;
+            border-color: #4472C4;
+        }
+        
+        .file-upload-area input {
+            display: none;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Banner installazione -->
+    <div id="installBanner" class="install-banner hidden">
+        📱 Tocca qui per installare l'app sulla home screen!
+    </div>
+    
+    <div class="container">
+        <!-- SCHERMATA CONFIGURAZIONE -->
+        <div id="setupScreen" class="screen">
+            <div class="header">
+                <h1>⚙️ Configurazione</h1>
+                <p>Setup iniziale dell'app</p>
+            </div>
+            
+            <div class="form">
+                <div class="info-box">
+                    <strong>📋 Cosa ti serve:</strong>
+                    1. Token API Baserow<br>
+                    2. ID della tua tabella<br>
+                    <a href="#" class="help-link" onclick="showHelp(); return false;">❓ Come trovare questi dati?</a>
+                </div>
+                
+                <form id="setupForm">
+                    <div class="form-group">
+                        <label for="apiToken">🔑 Token API Baserow</label>
+                        <input type="text" id="apiToken" placeholder="es. stTV1GmX4w3mkmF1PQPKh9gfMYv24IRs" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tableId">🗂️ Table ID</label>
+                        <input type="text" id="tableId" placeholder="es. 831459" required>
+                    </div>
+                    
+                    <button type="button" class="btn" onclick="testConnection()">
+                        🔍 Testa Connessione
+                    </button>
+                    
+                    <button type="submit" class="btn" style="margin-top: 10px; display: none;" id="saveConfigBtn">
+                        💾 Salva Configurazione
+                    </button>
+                    
+                    <div id="setupMessage" class="message"></div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- SCHERMATA HELP -->
+        <div id="helpScreen" class="screen">
+            <div class="header">
+                <h1>❓ Guida</h1>
+                <p>Come trovare Token e Table ID</p>
+            </div>
+            
+            <div class="form">
+                <div class="info-box">
+                    <strong>🔑 Token API:</strong>
+                    1. Vai su baserow.io e fai login<br>
+                    2. Click sull'icona profilo in alto a destra<br>
+                    3. Seleziona "Settings" → "API tokens"<br>
+                    4. Crea un nuovo token o copia quello esistente
+                </div>
+                
+                <div class="info-box">
+                    <strong>🗂️ Table ID:</strong>
+                    1. Apri la tua tabella in Baserow<br>
+                    2. Guarda l'URL del browser<br>
+                    3. Sarà tipo: baserow.io/database/XXXXX/table/<strong>831459</strong><br>
+                    4. Copia il numero finale (Table ID)
+                </div>
+                
+                <div class="info-box">
+                    <strong>📤 Come usare l'importazione JSON:</strong>
+                    1. Vai in chat con Claude<br>
+                    2. Elenca le tue spese (es. "Oggi: pane €1,10, caffè €1,50")<br>
+                    3. Claude ti crea un file JSON<br>
+                    4. Scarica il JSON<br>
+                    5. Nell'app: "Carica JSON" → Seleziona file → Tutte le spese caricate automaticamente!
+                </div>
+                
+                <button class="btn" onclick="showSetup()">
+                    ⬅️ Torna alla Configurazione
+                </button>
+            </div>
+        </div>
+        
+        <!-- SCHERMATA PRINCIPALE -->
+        <div id="mainScreen" class="screen">
+            <div class="header">
+                <h1>💰 Tracker Spese</h1>
+                <p>Aggiungi le tue spese velocemente</p>
+                <button class="settings-btn" onclick="showSetup()" title="Configurazione">⚙️</button>
+            </div>
+            
+            <div class="form">
+                <div class="config-status" id="configStatus" style="display: none;"></div>
+                
+                <!-- Area caricamento JSON -->
+                <div class="file-upload-area" id="uploadArea" onclick="document.getElementById('jsonFileInput').click()">
+                    <div class="upload-icon">📤</div>
+                    <strong>Carica JSON con Spese</strong>
+                    <p style="font-size: 14px; margin-top: 5px; color: #666;">
+                        Trascina qui il file JSON oppure clicca per selezionarlo
+                    </p>
+                    <input type="file" id="jsonFileInput" accept=".json,application/json">
+                </div>
+                
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+                
+                <div id="uploadMessage" class="message"></div>
+                
+                <div style="text-align: center; margin: 20px 0; color: #6c757d; font-weight: 600;">
+                    OPPURE
+                </div>
+                
+                <!-- Form manuale -->
+                <form id="spesaForm">
+                    <div class="form-group">
+                        <label for="data">📅 Data</label>
+                        <input type="date" id="data" name="data" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="descrizione">📝 Descrizione</label>
+                        <input type="text" id="descrizione" name="descrizione" placeholder="es. Pane, Caffè..." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="importo">💶 Importo (€)</label>
+                        <input type="text" id="importo" name="importo" inputmode="decimal" placeholder="es. 1,50 o 1.50" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="categoria">🏷️ Categoria</label>
+                        <select id="categoria" name="categoria" required>
+                            <option value="">Seleziona...</option>
+                            <option value="Alimentari">🍞 Alimentari</option>
+                            <option value="Ristorazione">🍕 Ristorazione</option>
+                            <option value="Bar/Caffè">☕ Bar/Caffè</option>
+                            <option value="Trasporti">🚗 Trasporti</option>
+                            <option value="Casa/Utenze">🏠 Casa/Utenze</option>
+                            <option value="Abbigliamento">👕 Abbigliamento</option>
+                            <option value="Intrattenimento">🎮 Intrattenimento</option>
+                            <option value="Salute">💊 Salute</option>
+                            <option value="Altro">🔧 Altro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="metodo">💳 Metodo Pagamento</label>
+                        <select id="metodo" name="metodo" required>
+                            <option value="">Seleziona...</option>
+                            <option value="Contanti">💵 Contanti</option>
+                            <option value="Carta">💳 Carta</option>
+                            <option value="Bancomat">🏧 Bancomat</option>
+                            <option value="PayPal/Digitale">📱 PayPal/Digitale</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="necessita">⚡ Necessità</label>
+                        <select id="necessita" name="necessita" required>
+                            <option value="">Seleziona...</option>
+                            <option value="Essenziale">✅ Essenziale</option>
+                            <option value="Utile">👍 Utile</option>
+                            <option value="Vizio">😋 Vizio</option>
+                            <option value="Spreco">❌ Spreco</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="note">📌 Note (opzionale)</label>
+                        <textarea id="note" name="note" rows="2" placeholder="Dettagli aggiuntivi..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="submitBtn">
+                        💾 Salva Spesa Singola
+                    </button>
+                    
+                    <div id="message" class="message"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Stato dell'app
+        let config = {
+            token: null,
+            tableId: null,
+            fieldMapping: {}
+        };
+        
+        let deferredPrompt;
+        
+        // Funzione per normalizzare importo (accetta sia virgola che punto, salva con virgola)
+        function normalizzaImporto(importo) {
+            // Rimuovi spazi
+            let valore = importo.toString().trim();
+            // Sostituisci punto con virgola (formato italiano)
+            valore = valore.replace('.', ',');
+            return valore;
+        }
+        
+        // Inizializzazione
+        window.addEventListener('DOMContentLoaded', () => {
+            loadConfig();
+            document.getElementById('data').valueAsDate = new Date();
+            setupDragAndDrop();
+            
+            // PWA install prompt
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                const banner = document.getElementById('installBanner');
+                banner.classList.remove('hidden');
+                
+                banner.onclick = async () => {
+                    banner.classList.add('hidden');
+                    deferredPrompt.prompt();
+                    await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                };
+            });
+        });
+        
+        // Setup drag and drop
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => {
+                    uploadArea.classList.add('dragover');
+                }, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => {
+                    uploadArea.classList.remove('dragover');
+                }, false);
+            });
+            
+            uploadArea.addEventListener('drop', handleDrop, false);
+        }
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                handleJSONFile(files[0]);
+            }
+        }
+        
+        // File input change
+        document.getElementById('jsonFileInput').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleJSONFile(e.target.files[0]);
+            }
+        });
+        
+        // Gestione file JSON
+        async function handleJSONFile(file) {
+            const messageDiv = document.getElementById('uploadMessage');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (!file.name.endsWith('.json')) {
+                showMessage(messageDiv, 'error', '❌ Seleziona un file JSON valido!');
+                return;
+            }
+            
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+                
+                if (!data.spese || !Array.isArray(data.spese)) {
+                    throw new Error('Formato JSON non valido. Deve contenere un array "spese"');
+                }
+                
+                const spese = data.spese;
+                
+                if (spese.length === 0) {
+                    throw new Error('Nessuna spesa trovata nel file JSON');
+                }
+                
+                showMessage(messageDiv, 'info', `📤 Trovate ${spese.length} spese. Invio in corso...`);
+                progressBar.style.display = 'block';
+                
+                let salvate = 0;
+                let errori = 0;
+                
+                for (let i = 0; i < spese.length; i++) {
+                    const spesa = spese[i];
+                    
+                    try {
+                        await salvaSpesa(spesa);
+                        salvate++;
+                    } catch (error) {
+                        errori++;
+                        console.error(`Errore salvando spesa ${i+1}:`, error);
+                    }
+                    
+                    // Aggiorna progress bar
+                    const percentuale = Math.round(((i + 1) / spese.length) * 100);
+                    progressFill.style.width = percentuale + '%';
+                    progressFill.textContent = `${salvate}/${spese.length}`;
+                }
+                
+                progressBar.style.display = 'none';
+                
+                if (errori === 0) {
+                    showMessage(messageDiv, 'success', 
+                        `✅ Tutte le ${salvate} spese sono state salvate con successo!`);
+                } else {
+                    showMessage(messageDiv, 'success', 
+                        `✅ Salvate ${salvate} spese su ${spese.length}. ${errori} errori.`);
+                }
+                
+                // Reset file input
+                document.getElementById('jsonFileInput').value = '';
+                
+            } catch (error) {
+                showMessage(messageDiv, 'error', `❌ Errore: ${error.message}`);
+                progressBar.style.display = 'none';
+            }
+        }
+        
+        // Salva singola spesa (usata sia dal form che dal JSON)
+        async function salvaSpesa(datiSpesa) {
+            const formData = {};
+            formData[config.fieldMapping['Data']] = datiSpesa.data;
+            formData[config.fieldMapping['Descrizione']] = datiSpesa.descrizione;
+            // IMPORTANTE: Salva importo con virgola italiana (campo Text in Baserow)
+            formData[config.fieldMapping['Importo']] = normalizzaImporto(datiSpesa.importo);
+            formData[config.fieldMapping['Categoria']] = datiSpesa.categoria;
+            formData[config.fieldMapping['Metodo pagamento']] = datiSpesa.metodo;
+            formData[config.fieldMapping['Necessità']] = datiSpesa.necessita;
+            formData[config.fieldMapping['Note']] = datiSpesa.note || '';
+            
+            const response = await fetch(
+                `https://api.baserow.io/api/database/rows/table/${config.tableId}/`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Token ${config.token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                }
+            );
+            
+            if (!response.ok) {
+                throw new Error('Errore durante il salvataggio');
+            }
+            
+            return await response.json();
+        }
+        
+        // Carica configurazione
+        function loadConfig() {
+            const saved = localStorage.getItem('trackerConfig');
+            if (saved) {
+                config = JSON.parse(saved);
+                showMain();
+                updateConfigStatus();
+            } else {
+                showSetup();
+            }
+        }
+        
+        // Salva configurazione
+        function saveConfig() {
+            localStorage.setItem('trackerConfig', JSON.stringify(config));
+        }
+        
+        // Test connessione
+        async function testConnection() {
+            const token = document.getElementById('apiToken').value.trim();
+            const tableId = document.getElementById('tableId').value.trim();
+            const messageDiv = document.getElementById('setupMessage');
+            const saveBtn = document.getElementById('saveConfigBtn');
+            
+            if (!token || !tableId) {
+                showMessage(messageDiv, 'error', '❌ Compila tutti i campi!');
+                return;
+            }
+            
+            messageDiv.className = 'message';
+            messageDiv.textContent = '🔄 Connessione in corso...';
+            messageDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch(
+                    `https://api.baserow.io/api/database/fields/table/${tableId}/`,
+                    {
+                        headers: {
+                            'Authorization': `Token ${token}`
+                        }
+                    }
+                );
+                
+                if (!response.ok) {
+                    throw new Error('Token o Table ID non validi');
+                }
+                
+                const fields = await response.json();
+                
+                // Mappa i campi
+                const fieldMapping = {};
+                const requiredFields = ['Data', 'Descrizione', 'Importo', 'Categoria', 
+                                       'Metodo pagamento', 'Necessità', 'Note'];
+                
+                fields.forEach(field => {
+                    const name = field.name;
+                    requiredFields.forEach(req => {
+                        if (name.toLowerCase() === req.toLowerCase()) {
+                            fieldMapping[req] = `field_${field.id}`;
+                        }
+                    });
+                });
+                
+                // Verifica campi
+                const missingFields = requiredFields.filter(f => !fieldMapping[f]);
+                
+                if (missingFields.length > 0) {
+                    throw new Error(`Campi mancanti: ${missingFields.join(', ')}`);
+                }
+                
+                showMessage(messageDiv, 'success', 
+                    `✅ Connessione riuscita! Trovati ${fields.length} campi.`);
+                
+                saveBtn.style.display = 'block';
+                
+                // Salva temporaneamente
+                config.token = token;
+                config.tableId = tableId;
+                config.fieldMapping = fieldMapping;
+                
+            } catch (error) {
+                showMessage(messageDiv, 'error', `❌ Errore: ${error.message}`);
+            }
+        }
+        
+        // Setup form submit
+        document.getElementById('setupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const messageDiv = document.getElementById('setupMessage');
+            
+            saveConfig();
+            showMessage(messageDiv, 'success', '✅ Configurazione salvata!');
+            
+            setTimeout(() => {
+                showMain();
+                updateConfigStatus();
+            }, 1000);
+        });
+        
+        // Form spesa submit
+        document.getElementById('spesaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('message');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Invio in corso...';
+            
+            const datiSpesa = {
+                data: document.getElementById('data').value,
+                descrizione: document.getElementById('descrizione').value,
+                importo: document.getElementById('importo').value,
+                categoria: document.getElementById('categoria').value,
+                metodo: document.getElementById('metodo').value,
+                necessita: document.getElementById('necessita').value,
+                note: document.getElementById('note').value
+            };
+            
+            try {
+                await salvaSpesa(datiSpesa);
+                
+                showMessage(messageDiv, 'success', '✅ Spesa salvata con successo!');
+                
+                // Reset form
+                document.getElementById('spesaForm').reset();
+                document.getElementById('data').valueAsDate = new Date();
+                
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                showMessage(messageDiv, 'error', `❌ Errore: ${error.message}`);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💾 Salva Spesa Singola';
+            }
+        });
+        
+        // Utility functions
+        function showMessage(div, type, text) {
+            div.className = `message ${type}`;
+            div.textContent = text;
+            div.style.display = 'block';
+        }
+        
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+        
+        function showSetup() {
+            document.getElementById('apiToken').value = config.token || '';
+            document.getElementById('tableId').value = config.tableId || '';
+            document.getElementById('saveConfigBtn').style.display = 'none';
+            document.getElementById('setupMessage').style.display = 'none';
+            showScreen('setupScreen');
+        }
+        
+        function showMain() {
+            showScreen('mainScreen');
+        }
+        
+        function showHelp() {
+            showScreen('helpScreen');
+        }
+        
+        function updateConfigStatus() {
+            const status = document.getElementById('configStatus');
+            if (config.token && config.tableId) {
+                status.textContent = `✅ Connesso a Baserow (Tabella ${config.tableId})`;
+                status.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
